@@ -98,17 +98,80 @@
 4.  访问 `http://localhost:3000` 即可使用。
     - 数据库文件会持久化在当前目录的 `./postgres-data` 文件夹中。
 
-## 🔄 如何启用自动更新 (Auto Update)
+## 🔄 自动更新 (Auto Update)
 
-如果你 Fork 了本项目，可以通过启用 GitHub Actions 来实现每天自动同步上游最新代码（并触发 Vercel 重部署）：
+如果你使用 Vercel 一键部署，默认可能不会包含 GitHub Actions 配置文件。你需要手动创建它来实现每天自动同步上游最新代码（并触发 Vercel 重部署）。
+
+### 1. 配置 Workflow 权限
+
+为了让 GitHub Actions 有权限强制推送到你的仓库，必须先开启写入权限：
 
 1.  进入你的 GitHub 仓库页面。
-2.  点击上方的 **Actions** 标签页。
-3.  在左侧栏找到 **Upstream Sync**。
-4.  点击 **Enable workflow** 按钮。
-5.  (可选) 点击 **Run workflow** 手动触发一次同步测试。
+2.  点击上方的 **Settings** (设置) 标签页。
+3.  左侧菜单点击 **Actions** -> **General**。
+4.  滚动到页面底部的 **Workflow permissions** 区域。
+5.  选中 **Read and write permissions**。
+6.  点击 **Save** 保存。
 
-启用后，脚本将每天定时检查 `chatgptuk/ldc-shop:main` 的更新并合并到你的仓库。
+### 2. 创建同步脚本
+
+1.  在你的仓库中，创建文件：`.github/workflows/sync.yml`
+2.  填入以下内容（这是强制同步脚本，会自动解决从 Vercel 克隆产生的历史不一致问题）：
+
+```yaml
+name: Upstream Sync
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # 每天运行一次
+  workflow_dispatch:
+
+jobs:
+  sync_latest_from_upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 
+
+      - name: Sync Upstream
+        uses: actions/github-script@v6
+        with:
+          script: |
+            try {
+              // Configure Git
+              await exec.exec('git', ['config', '--global', 'user.name', 'GitHub Actions']);
+              await exec.exec('git', ['config', '--global', 'user.email', 'actions@github.com']);
+
+              // Add Upstream
+              await exec.exec('git', ['remote', 'add', 'upstream', 'https://github.com/chatgptuk/ldc-shop.git']);
+              await exec.exec('git', ['fetch', 'upstream']);
+
+              // Hard Reset to Upstream Main
+              // 使用 Reset --hard 直接覆盖，忽略历史差异和冲突
+              await exec.exec('git', ['checkout', 'main']);
+              await exec.exec('git', ['reset', '--hard', 'upstream/main']);
+
+              // Force Push
+              await exec.exec('git', ['push', 'origin', 'main', '--force']);
+              
+            } catch (error) {
+              core.setFailed(`Sync failed: ${error.message}`);
+            }
+```
+
+3.  提交更改。
+
+### 3. 启用并测试
+
+1.  点击仓库上方的 **Actions** 标签页。
+2.  左侧应该会出现 **Upstream Sync**。
+3.  点击它，然后点击右侧的 **Run workflow** -> **Run workflow** 手动触发一次。
+4.  如果显示绿色的 ✅，说明配置成功！以后它会自动每天运行。
 
 ## 💡 建议：绑定自定义域名
 
