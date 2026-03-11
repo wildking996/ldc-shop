@@ -712,6 +712,8 @@
         "inboxTitle": "收件箱",
         "sentTitle": "已发送",
         "sentEmpty": "暂无已发送消息",
+        "clearSent": "清空发件箱",
+        "sentCleared": "发件箱已清空",
         "settingsTitle": "设置",
         "inboxEmpty": "暂无通知",
         "markAllRead": "全部已读",

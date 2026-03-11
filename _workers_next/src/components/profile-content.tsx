@@ -16,7 +16,7 @@ import { updateDesktopNotifications, updateProfileEmail } from "@/actions/profil
 import { useEffect, useRef, useState } from "react"
 import { CheckInButton } from "@/components/checkin-button"
 import { clearMyNotifications, getMyNotifications, markAllNotificationsRead, markNotificationRead } from "@/actions/user-notifications"
-import { sendUserMessage } from "@/actions/user-messages"
+import { sendUserMessage, clearMyMessages } from "@/actions/user-messages"
 import { cn } from "@/lib/utils"
 
 interface ProfileContentProps {
@@ -72,6 +72,7 @@ export function ProfileContent({ user, points, checkinEnabled, orderStats, notif
     const [desktopSaving, setDesktopSaving] = useState(false)
     const [sentMessages, setSentMessages] = useState(initialSentMessages)
     const [expandedSentIds, setExpandedSentIds] = useState<number[]>([])
+    const [clearingSent, setClearingSent] = useState(false)
     const [msgTab, setMsgTab] = useState<'inbox' | 'sent'>('inbox')
     const notifiedIdsRef = useRef<Set<number>>(new Set())
 
@@ -348,6 +349,33 @@ export function ProfileContent({ user, points, checkinEnabled, orderStats, notif
                                         {t('profile.clearInbox')}
                                     </Button>
                                 </>
+                            )}
+                            {msgTab === 'sent' && sentMessages.length > 0 && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-7 text-xs"
+                                    disabled={clearingSent}
+                                    onClick={async () => {
+                                        if (clearingSent) return
+                                        setClearingSent(true)
+                                        try {
+                                            const res = await clearMyMessages()
+                                            if (res?.success) {
+                                                setSentMessages([])
+                                                toast.success(t('profile.sentCleared'))
+                                            } else {
+                                                toast.error(t('common.error'))
+                                            }
+                                        } catch {
+                                            toast.error(t('common.error'))
+                                        } finally {
+                                            setClearingSent(false)
+                                        }
+                                    }}
+                                >
+                                    {t('profile.clearSent')}
+                                </Button>
                             )}
                             <Button
                                 variant={showComposeForm ? 'secondary' : 'outline'}

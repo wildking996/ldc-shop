@@ -712,6 +712,8 @@
         "inboxTitle": "Inbox",
         "sentTitle": "Sent",
         "sentEmpty": "No sent messages yet.",
+        "clearSent": "Clear sent",
+        "sentCleared": "Sent messages cleared",
         "settingsTitle": "Settings",
         "inboxEmpty": "No notifications yet.",
         "markAllRead": "Mark all read",
