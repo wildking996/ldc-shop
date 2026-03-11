@@ -348,46 +348,45 @@ export function OrderContent({ order, canViewKey, isOwner, refundRequest }: Orde
                         </div>
                     )}
 
-                    {isOwner && (order.status === 'paid' || order.status === 'delivered') && Number(order.amount) > 0 && (
+                    {isOwner && (order.status === 'paid' || order.status === 'delivered') && (
                         <>
                             <Separator className="bg-border/50" />
-                            <div className="space-y-3">
-                                <h3 className="font-semibold">{t('refund.requestTitle')}</h3>
-                                {refundRequest?.status ? (
-                                    <div className="space-y-1">
-                                        <div className="text-sm text-muted-foreground">
-                                            {t('refund.requestStatus', { status: t(`refund.statusValues.${refundRequest.status}`) })}
-                                        </div>
-                                        {refundRequest.adminNote && (
-                                            <div className="text-sm text-muted-foreground">
-                                                {t('refund.adminNote')}{refundRequest.adminNote}
-                                            </div>
-                                        )}
-                                    </div>
-                                ) : (
+                            {refundRequest?.status ? (
+                                <div className="space-y-1">
                                     <div className="text-sm text-muted-foreground">
-                                        {t('refund.requestHint')}
+                                        {t('refund.requestStatus', { status: t(`refund.statusValues.${refundRequest.status}`) })}
                                     </div>
-                                )}
-                                <Textarea
-                                    value={reason}
-                                    onChange={(e) => setReason(e.target.value)}
-                                    placeholder={t('refund.reasonPlaceholder')}
-                                    rows={3}
-                                    className="resize-none"
-                                    disabled={submitting || !!refundRequest?.status}
-                                />
-                                <div className="flex justify-end">
-                                    <Button
-                                        onClick={async () => {
-                                            setConfirmOpen(true)
-                                        }}
-                                        disabled={submitting || !!refundRequest?.status}
-                                    >
-                                        {submitting ? t('common.processing') : t('refund.requestButton')}
-                                    </Button>
+                                    {refundRequest.adminNote && (
+                                        <div className="text-sm text-muted-foreground">
+                                            {t('refund.adminNote')}{refundRequest.adminNote}
+                                        </div>
+                                    )}
                                 </div>
-                            </div>
+                            ) : (
+                                <div className="flex gap-3">
+                                    {order.productId && !isPayment && (
+                                        <Button
+                                            variant="outline"
+                                            className="flex-1"
+                                            onClick={() => {
+                                                window.location.href = `/buy/${order.productId}#reviews`
+                                            }}
+                                        >
+                                            {t('order.goReview')}
+                                        </Button>
+                                    )}
+                                    {Number(order.amount) > 0 && (
+                                        <Button
+                                            variant="destructive"
+                                            className={order.productId && !isPayment ? "flex-1" : "w-full"}
+                                            onClick={() => setConfirmOpen(true)}
+                                            disabled={submitting}
+                                        >
+                                            {t('refund.requestTitle')}
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
                         </>
                     )}
                 </CardContent>
@@ -408,11 +407,19 @@ export function OrderContent({ order, canViewKey, isOwner, refundRequest }: Orde
                             </div>
                         </div>
                     </DialogHeader>
+                    <Textarea
+                        value={reason}
+                        onChange={(e) => setReason(e.target.value)}
+                        placeholder={t('refund.reasonPlaceholder')}
+                        rows={3}
+                        className="resize-none"
+                        disabled={submitting}
+                    />
                     <DialogFooter className="sm:justify-end">
                         <Button variant="outline" onClick={() => setConfirmOpen(false)} disabled={submitting}>
                             {t('common.cancel')}
                         </Button>
-                        <Button onClick={handleRefundConfirm} disabled={submitting}>
+                        <Button variant="destructive" onClick={handleRefundConfirm} disabled={submitting}>
                             {submitting ? t('common.processing') : t('common.confirm')}
                         </Button>
                     </DialogFooter>

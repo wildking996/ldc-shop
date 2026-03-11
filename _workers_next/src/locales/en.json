@@ -199,6 +199,7 @@
         "cannotCancel": "Cannot cancel this order",
         "notFound": "Order not found",
         "paymentSuccess": "Payment successful!",
+        "goReview": "Write a Review",
         "status": {
             "pending": "Pending",
             "paid": "Paid",
@@ -258,6 +259,7 @@
             "inboxEmpty": "No user messages.",
             "inboxUser": "User",
             "markRead": "Mark read",
+            "reply": "Reply",
             "clearHistory": "Clear history",
             "clearInbox": "Clear inbox",
             "clearConfirm": "Clear all messages? This cannot be undone.",

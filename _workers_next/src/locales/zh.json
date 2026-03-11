@@ -199,6 +199,7 @@
         "cannotCancel": "无法取消此订单",
         "notFound": "订单不存在",
         "paymentSuccess": "支付成功！",
+        "goReview": "去评价",
         "status": {
             "pending": "待支付",
             "paid": "已支付",
@@ -258,6 +259,7 @@
             "inboxEmpty": "暂无用户消息",
             "inboxUser": "用户",
             "markRead": "标为已读",
+            "reply": "回复",
             "clearHistory": "清空历史",
             "clearInbox": "清空收件箱",
             "clearConfirm": "确认清空全部消息？此操作不可撤销。",
